@@ -12,8 +12,8 @@ class NoteController extends Controller
      */
     public function index()
     {
-        $notes = note::query()->orderBy('created_at', 'desc')->get()->paginate(10);
-        dd($notes);
+        $notes = note::query()->orderBy('created_at', 'desc')->get();
+
         return view('note.index', ['notes' => $notes]);
     }
 
@@ -30,7 +30,15 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        return view('note.store');
+
+        $data = $request->validate([
+            'note' => ['require', 'string']
+        ]);
+
+        $data['user_id'] = 1;
+        $note = Note::create($data);
+
+        return to_route('note.show', $note)->with('message', 'note sucessfully created!');
     }
 
     /**
@@ -54,7 +62,13 @@ class NoteController extends Controller
      */
     public function update(Request $request, note $note)
     {
-        return 'update';
+        $data = $request->validate([
+            'note' => ['require', 'string']
+        ]);
+
+        $note->update($data);
+
+        return to_route('note.update', $note)->with('message', 'updated napo pukingnang ina');
     }
 
     /**
@@ -62,6 +76,8 @@ class NoteController extends Controller
      */
     public function destroy(note $note)
     {
-        return 'destroy';
+        $note->delete();
+
+        return to_route('note.index', $note)->with('message', 'deleted yawa');
     }
 }
